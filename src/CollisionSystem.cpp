@@ -44,7 +44,7 @@ void CollisionSystem::update(float dt) {
                         colliders[i].colliding = colliders[j].colliding = true;
                         colliders[i].collision_point = colliders[j].collision_point = col_point;
                         colliders[i].collision_distance = colliders[j].collision_distance = col_distance;
-						colliders[i].other = j; colliders[j].other = i;
+						colliders[i].other = (int)j; colliders[j].other = (int)i;
                     }
                 }
             }

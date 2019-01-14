@@ -35,7 +35,7 @@ void DebugSystem::init() {
 	Collider& picking_ray = ECS.createComponentForEntity<Collider>(ent_picking_ray_);
 	picking_ray.collider_type = ColliderTypeRay;
 	picking_ray.direction = lm::vec3(0, 0, -1);
-	picking_ray.max_distance = 0.001;
+	picking_ray.max_distance = 0.001f;
 }
 
 //draws debug information or not
@@ -79,7 +79,12 @@ void DebugSystem::update(float dt) {
         if (draw_frustra_) {
             //draw frustra for all cameras
             auto& cameras = ECS.getAllComponents<Camera>();
+			int counter = 0;
             for (auto& cc : cameras) {
+				//don't draw rendering camera frustum
+				if (counter == ECS.main_camera) continue;
+				counter++;
+
                 lm::mat4 cam_iv = cc.view_matrix;
                 cam_iv.inverse();
                 lm::mat4 cam_ip = cc.projection_matrix;

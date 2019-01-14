@@ -45,10 +45,10 @@ void GUISystem::lateInit() {
 		lm::vec3 blc = mvp * bl;
 		lm::vec3 trc = mvp * tr;
 
-		el.screen_bounds.x_min = ((blc.x + 1) / 2) * width_;
-		el.screen_bounds.x_max = ((trc.x + 1) / 2) * width_;
-		el.screen_bounds.y_min = height_ - ((trc.y + 1) / 2) * height_;
-		el.screen_bounds.y_max = height_ - ((blc.y + 1) / 2) * height_; 
+		el.screen_bounds.x_min = (((int)blc.x + 1) / 2) * width_;
+		el.screen_bounds.x_max = (((int)trc.x + 1) / 2) * width_;
+		el.screen_bounds.y_min = height_ - (((int)trc.y + 1) / 2) * height_;
+		el.screen_bounds.y_max = height_ - (((int)blc.y + 1) / 2) * height_;
 	}
 
 	//for all texts
