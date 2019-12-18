@@ -222,6 +222,34 @@ void DebugSystem::update(float dt) {
 	updateimGUI_(dt);
 }
 
+// recursive function to render a transform node in imGUI
+void imGuiRenderTransformNode(TransformNode& trans) {
+    auto& ent = ECS.entities[trans.entity_owner];
+    if (ImGui::TreeNode(ent.name.c_str())) {
+        Transform& transform = ECS.getComponentFromEntity<Transform>(ent.name);
+        lm::vec3 pos = transform.position();
+        float pos_array[3] = { pos.x, pos.y, pos.z };
+        ImGui::DragFloat3("Position", pos_array);
+        transform.position(pos_array[0], pos_array[1], pos_array[2]);
+        for (auto& child : trans.children) {
+
+            imGuiRenderTransformNode(child);
+        }
+        ImGui::TreePop();
+    }
+}
+
+void imGUIRenderTransform(Transform& trans) {
+    auto& ent = ECS.entities[trans.owner];
+    if (ImGui::TreeNode(ent.name.c_str())) {
+        lm::vec3 pos = trans.position();
+        float pos_array[3] = { pos.x, pos.y, pos.z };
+        ImGui::DragFloat3("Position", pos_array);
+        trans.position(pos_array[0], pos_array[1], pos_array[2]);
+        ImGui::TreePop();
+    }
+}
+
 void DebugSystem::updateimGUI_(float dt) {
 
 	if (show_imGUI_)
@@ -274,11 +302,19 @@ void DebugSystem::updateimGUI_(float dt) {
 		
 		//start ImGui columns
 		ImGui::Columns(2, "columns");
-
-		// ** LIST TRANSFORMS ** //
-
-		// TODO: 
-		// - draw each transform using ImGui::TreeNode (see camera example above)
+        
+        
+		// TODO: - draw each transform using ImGui::TreeNode (see camera example above)
+        // - create a separate function (imGuiRenderTransform)
+        // - get all transforms
+        // - for each transform:
+        //  - get owner entity
+        //  - create node with entity name
+        //  - create float[3] array with transform position
+        //  - create IMGUI::DragFloat3 using this array
+        //  - set transform position based on array
+        //  - call ImGUI::TreePop to finish, otherwise it will crash
+            
 
 		// Advanced task:
 		// - Create entity hiearchy using the 'TransformNode' class (defined in DebugSystem.h)
@@ -287,14 +323,17 @@ void DebugSystem::updateimGUI_(float dt) {
 		//   - create new vector of Transform nodes for *only top level nodes*
 		// - Create recursive function to draw all transforms nodes, using hierarchy
 
-
 		//next column
 		ImGui::NextColumn();
 		
-		// ** OBJECT PICKING ** //
-		
-		//now check if we have a collision of the picking ray
-		//if so, we change variable for imgui window
+		//*** PICKING*** //
+        //general approach: Debug System has a member variable which is an entity
+        //with Ray Collider (ent_picking_ray_). When user clicks on the screen, this
+        //ray is fired into the scene.
+        //if it collides with a box collider, we read that collision here and render
+        //imGUI with the details of the collider
+        
+        //look at DebugSystem::setPickingRay_() to see how picking ray is constructed
 
 		//get the pick ray first
 		Collider& pick_ray_collider = ECS.getComponentFromEntity<Collider>(ent_picking_ray_);
@@ -332,6 +371,7 @@ void DebugSystem::setPickingRay(int mouse_x, int mouse_y, int screen_width, int 
 
 	//TODO:
 	// - convert mouse_x and mouse_y to NDC - get coordinate of mouse coords on near plane
+    // e.g. for x => ((mouse_x / screen_width) * 2) -1
 	// - create inverse viewprojection matrix of camera
 	// - multiply mouse position on near plane of NDC by inverse vp = world position of mouse
 	//    - inverse viewprojection gives a VECTOR4 in homogenous coordinates, so must normalize!
