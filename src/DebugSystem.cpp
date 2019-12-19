@@ -222,34 +222,6 @@ void DebugSystem::update(float dt) {
 	updateimGUI_(dt);
 }
 
-// recursive function to render a transform node in imGUI
-void imGuiRenderTransformNode(TransformNode& trans) {
-    auto& ent = ECS.entities[trans.entity_owner];
-    if (ImGui::TreeNode(ent.name.c_str())) {
-        Transform& transform = ECS.getComponentFromEntity<Transform>(ent.name);
-        lm::vec3 pos = transform.position();
-        float pos_array[3] = { pos.x, pos.y, pos.z };
-        ImGui::DragFloat3("Position", pos_array);
-        transform.position(pos_array[0], pos_array[1], pos_array[2]);
-        for (auto& child : trans.children) {
-
-            imGuiRenderTransformNode(child);
-        }
-        ImGui::TreePop();
-    }
-}
-
-void imGUIRenderTransform(Transform& trans) {
-    auto& ent = ECS.entities[trans.owner];
-    if (ImGui::TreeNode(ent.name.c_str())) {
-        lm::vec3 pos = trans.position();
-        float pos_array[3] = { pos.x, pos.y, pos.z };
-        ImGui::DragFloat3("Position", pos_array);
-        trans.position(pos_array[0], pos_array[1], pos_array[2]);
-        ImGui::TreePop();
-    }
-}
-
 void DebugSystem::updateimGUI_(float dt) {
 
 	if (show_imGUI_)
